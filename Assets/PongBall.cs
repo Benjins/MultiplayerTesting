@@ -10,8 +10,10 @@ public class PongBall : NetworkBehaviour
 
 	public float sign = 1.0f;
 
-	float theirY = Mathf.Infinity;
-	float ourY = Mathf.NegativeInfinity;
+	// For now, the ball mostly travels back and forth on the X axis,
+	// not including potential up/down dips
+	float theirX = Mathf.Infinity;
+	float ourX = Mathf.NegativeInfinity;
 
 	void Start()
 	{
@@ -19,13 +21,13 @@ public class PongBall : NetworkBehaviour
 		
 		if (players[0].isLocalPlayer)
 		{
-			ourY = players[0].transform.position.y;
-			theirY = players[1].transform.position.y;
+			ourX = players[0].transform.position.x;
+			theirX = players[1].transform.position.x;
 		}
 		else
 		{
-			theirY = players[0].transform.position.y;
-			ourY = players[1].transform.position.y;
+			theirX = players[0].transform.position.x;
+			ourX = players[1].transform.position.x;
 		}
 
 	}
@@ -35,15 +37,15 @@ public class PongBall : NetworkBehaviour
 		// so it's the one moving it
 		if (isServer)
 		{
-			float minY = Mathf.Min(ourY, theirY);
-			float maxY = Mathf.Max(ourY, theirY);
-			transform.position += Vector3.up * Time.deltaTime * speed * sign;
+			float minX = Mathf.Min(ourX, theirX);
+			float maxX = Mathf.Max(ourX, theirX);
+			transform.position += Vector3.right * Time.deltaTime * speed * sign;
 
-			if (transform.position.y > maxY)
+			if (transform.position.x > maxX)
 			{
 				sign = -1.0f;
 			}
-			else if (transform.position.y < minY)
+			else if (transform.position.x < minX)
 			{
 				sign = 1.0f;
 			}
