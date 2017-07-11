@@ -88,8 +88,11 @@ public class PongBall : NetworkBehaviour
 	void HandlePaddle(PlayerControl player)
 	{
 		float ballZ = transform.position.z;
-		float minZ = player.transform.position.z - player.transform.localScale.z;
-		float maxZ = player.transform.position.z + player.transform.localScale.z;
+		// NOTE: We read from the x of localscale because the player is rotated
+		// basically, we want the width of the paddle
+		// Also note that the ball's width is not taken into account here
+		float minZ = player.transform.position.z - player.transform.localScale.x / 2;
+		float maxZ = player.transform.position.z + player.transform.localScale.x / 2;
 
 		if (ballZ < minZ || ballZ > maxZ)
 		{
