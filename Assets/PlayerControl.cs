@@ -22,6 +22,7 @@ public class PlayerControl : NetworkBehaviour
 		if (!hasAuthority)
 		{
 			GetComponentInChildren<Camera>().enabled = false;
+			GetComponentInChildren<AudioListener>().enabled = false;
 		}
 		else
 		{

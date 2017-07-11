@@ -21,6 +21,11 @@ public class PongBall : NetworkBehaviour
 	float minY = 0.0f;
 	float maxY = 0.0f;
 
+	// These determine the left/right bounds,
+	// left/right being according to the players
+	float fieldMinZ = -8.0f;
+	float fieldMaxZ = 8.0f;
+
 	float zVelocity = 0.0f;
 
 	Vector3 startPos;
@@ -61,6 +66,7 @@ public class PongBall : NetworkBehaviour
 			float minX = Mathf.Min(ourX, theirX);
 			float maxX = Mathf.Max(ourX, theirX);
 			transform.position += Vector3.right * Time.deltaTime * speed * sign;
+			transform.position += Vector3.forward * Time.deltaTime * zVelocity;
 
 			float medX = (minX + maxX) / 2;
 			float xDiff = maxX - minX;
@@ -89,7 +95,7 @@ public class PongBall : NetworkBehaviour
 	{
 		float ballZ = transform.position.z;
 		// NOTE: We read from the x of localscale because the player is rotated
-		// basically, we want the width of the paddle
+		// Basically, we want the width of the paddle
 		// Also note that the ball's width is not taken into account here
 		float minZ = player.transform.position.z - player.transform.localScale.x / 2;
 		float maxZ = player.transform.position.z + player.transform.localScale.x / 2;
@@ -100,7 +106,20 @@ public class PongBall : NetworkBehaviour
 		}
 		else
 		{
-			zVelocity = 0.0f;
+			// This is in range [0, 1], 0 being all the way on the left side of the paddle
+			// and 1 being on the right side
+			float normalizedZ = (ballZ - minZ) / (maxZ - minZ);
+
+			// Where we want the ball to end up on the far end
+			// based on where it hit the paddle
+			float desiredFinalFieldZ = Mathf.Lerp(fieldMinZ, fieldMaxZ, normalizedZ);
+			float zDiff = desiredFinalFieldZ - ballZ;
+			float xDiff = Mathf.Abs(ourX - theirX);
+			float velocityRatio = zDiff / xDiff;
+
+			Debug.Log("velocity ratio: " + velocityRatio);
+
+			zVelocity = velocityRatio * speed;
 		}
 	}
 }
